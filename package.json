@@ -1,0 +1,15 @@
+{
+  "name": "master-cheat",
+  "version": "1.0.0",
+  "description": "Master Cheat - Code generation system",
+  "scripts": {
+    "start": "node start.js",
+    "build": "cd backend && npm install && npm run build && cd ../frontend && npm install && npm run build",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "seed": "cd backend && npm run seed",
+    "vercel:build": "cd backend && npm install && npm run build && cd ../frontend && npm install && npm run build"
+  },
+  "dependencies": {
+    "detect-port": "^2.1.0"
+  }
+}
