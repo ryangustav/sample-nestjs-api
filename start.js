@@ -1,7 +1,6 @@
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const { detect } = require('detect-port');
 
 function waitForFile(filePath, timeout = 60000) {
   return new Promise((resolve, reject) => {
@@ -32,7 +31,7 @@ async function main() {
   const shell = isWin;
   let frontend = null;
 
-  console.log('[BACK] Iniciando backend NestJS...');
+  console.log('[BACK] Iniciando backend NestJS (SWC)...');
   const backend = spawn('npm', ['run', 'start'], {
     cwd: path.resolve(__dirname, 'backend'),
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -60,17 +59,12 @@ async function main() {
     process.exit(1);
   }
 
-  const frontendPort = await detect(3000);
-  console.log(`[FRONT] Porta livre encontrada: ${frontendPort}`);
-
   const frontendEnv = {
     ...process.env,
-    PORT: String(frontendPort),
-    REACT_APP_BACKEND_PORT: String(backendPort),
-    BROWSER: 'none',
+    VITE_BACKEND_PORT: String(backendPort),
   };
 
-  console.log('[FRONT] Iniciando frontend React...');
+  console.log('[FRONT] Iniciando frontend Vite...');
   frontend = spawn('npm', ['run', 'start'], {
     cwd: path.resolve(__dirname, 'frontend'),
     stdio: ['ignore', 'pipe', 'pipe'],

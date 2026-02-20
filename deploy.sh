@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+APP_DIR="/home/ubuntu/master-cheat"
+
+echo "==> Atualizando código..."
+cd "$APP_DIR"
+git pull origin main
+
+echo "==> Instalando dependências do backend..."
+cd backend && npm ci --omit=dev
+npm run build
+cd ..
+
+echo "==> Instalando dependências do frontend..."
+cd frontend && npm ci
+npm run build
+cd ..
+
+echo "==> Reiniciando aplicação..."
+pm2 restart ecosystem.config.js --env production || pm2 start ecosystem.config.js --env production
+pm2 save
+
+echo "==> Deploy concluído!"

@@ -4,12 +4,9 @@
   "description": "Master Cheat - Code generation system",
   "scripts": {
     "start": "node start.js",
-    "build": "cd backend && npm install && npm run build && cd ../frontend && npm install && npm run build",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "start:prod": "cd backend && node dist/main.js",
     "install:all": "cd backend && npm install && cd ../frontend && npm install",
-    "seed": "cd backend && npm run seed",
-    "vercel:build": "cd backend && npm install && npm run build && cd ../frontend && npm install && npm run build"
-  },
-  "dependencies": {
-    "detect-port": "^2.1.0"
+    "seed": "cd backend && npm run seed"
   }
 }

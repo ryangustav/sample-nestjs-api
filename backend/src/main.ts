@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as net from 'net';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -26,10 +27,22 @@ async function findFreePort(startPort: number): Promise<number> {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+
+  const frontendPath = path.resolve(__dirname, '..', '..', 'frontend', 'build');
+  if (fs.existsSync(frontendPath)) {
+    app.useStaticAssets(frontendPath);
+    app.setBaseViewsDir(frontendPath);
+
+    const httpAdapter = app.getHttpAdapter();
+    httpAdapter.get('*', (req, res, next) => {
+      if (req.url.startsWith('/api/')) return next();
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    });
+  }
 
   const basePort = parseInt(process.env.PORT, 10) || 3001;
   const port = await findFreePort(basePort);
@@ -38,6 +51,9 @@ async function bootstrap() {
   fs.writeFileSync(portFile, String(port));
 
   await app.listen(port);
-  console.log(`Backend NestJS rodando na porta ${port}`);
+  console.log(`Backend rodando na porta ${port}`);
+  if (fs.existsSync(frontendPath)) {
+    console.log(`Frontend servido em http://localhost:${port}`);
+  }
 }
 bootstrap();
