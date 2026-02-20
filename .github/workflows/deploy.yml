@@ -16,7 +16,7 @@ jobs:
           key: ${{ secrets.ORACLE_SSH_KEY }}
           port: 22
           script: |
-            cd /home/${{ secrets.ORACLE_USER }}/app/sample-nestjs-api
+            cd ${{ secrets.ORACLE_APP_PATH }}
             git fetch origin && git reset --hard origin/main
             chmod +x deploy.sh
             ./deploy.sh
