@@ -10,11 +10,15 @@ jobs:
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         with:
           host: ${{ secrets.ORACLE_HOST }}
           username: ${{ secrets.ORACLE_USER }}
           key: ${{ secrets.ORACLE_SSH_KEY }}
           port: 22
+          envs: MONGODB_URI,JWT_SECRET
           script: |
             APP_PATH="${{ secrets.ORACLE_APP_PATH }}"
             REPO_URL="https://github.com/${{ github.repository }}.git"
@@ -29,5 +33,18 @@ jobs:
             fi
             cd "$APP_PATH"
             git fetch origin && git reset --hard origin/main
+            if [ -n "$MONGODB_URI" ]; then
+              echo "MONGODB_URI=$MONGODB_URI" > backend/.env
+              echo "JWT_SECRET=$JWT_SECRET" >> backend/.env
+              echo "PORT=3001" >> backend/.env
+              echo "==> backend/.env configurado"
+            fi
             chmod +x deploy.sh
             ./deploy.sh
+            if command -v nginx >/dev/null 2>&1; then
+              sudo cp "$APP_PATH/nginx.conf" /etc/nginx/sites-available/master-cheat
+              sudo ln -sf /etc/nginx/sites-available/master-cheat /etc/nginx/sites-enabled/
+              sudo rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
+              sudo nginx -t 2>/dev/null && sudo systemctl reload nginx 2>/dev/null || true
+              echo "==> Nginx configurado"
+            fi
