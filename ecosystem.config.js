@@ -4,8 +4,8 @@ module.exports = {
   apps: [
     {
       name: 'master-cheat',
-      script: 'backend/dist/main.js',
-      cwd: path.resolve(__dirname),
+      script: 'dist/main.js',
+      cwd: path.resolve(__dirname, 'backend'),
       instances: 1,
       autorestart: true,
       watch: false,
