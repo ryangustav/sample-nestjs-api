@@ -16,5 +16,8 @@ jobs:
           key: ${{ secrets.ORACLE_SSH_KEY }}
           port: 22
           script: |
-            cd /home/${{ secrets.ORACLE_USER }}/master-cheat
-            bash deploy.sh
+            cd /home/${{ secrets.ORACLE_USER }}/apps/sample-nestjs-api
+            # Garante que o script tem permissão de execução
+            chmod +x deploy.sh
+            # Executa o deploy
+            ./deploy.sh
