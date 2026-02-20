@@ -6,7 +6,7 @@ echo "==> Diretório do projeto: $APP_DIR"
 
 echo "==> Atualizando código..."
 cd "$APP_DIR"
-git pull origin main
+git fetch origin && git reset --hard origin/main
 
 echo "==> Instalando dependências do backend..."
 cd backend && npm ci --omit=dev

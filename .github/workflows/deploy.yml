@@ -16,12 +16,7 @@ jobs:
           key: ${{ secrets.ORACLE_SSH_KEY }}
           port: 22
           script: |
-            # 1. Entra na pasta do projeto
-            cd /home/${{ secrets.ORACLE_USER }}/apps/sample-nestjs-api
-            
-            # 2. Força a atualização do código para trazer o deploy.sh do Git
-            git pull origin main
-            
-            # 3. Agora que o arquivo existe, dá permissão e executa
+            cd /home/${{ secrets.ORACLE_USER }}/app/sample-nestjs-api
+            git fetch origin && git reset --hard origin/main
             chmod +x deploy.sh
             ./deploy.sh
