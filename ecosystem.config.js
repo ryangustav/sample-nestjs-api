@@ -13,6 +13,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3001,
+        MONGODB_URI: 'mongodb+srv://back:lunnaback@cluster0.hmxntqd.mongodb.net/headtricl?appName=Cluster0',
+        JWT_SECRET: 'mastercheat_secret_key_2026_xK9mP2vL',
       },
     },
   ],
