@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-APP_DIR="/home/ubuntu/master-cheat"
+APP_DIR="$(cd "$(dirname "$0")" && pwd)"
+echo "==> Diretório do projeto: $APP_DIR"
 
 echo "==> Atualizando código..."
 cd "$APP_DIR"
