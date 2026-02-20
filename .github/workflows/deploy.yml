@@ -34,8 +34,8 @@ jobs:
             cd "$APP_PATH"
             git fetch origin && git reset --hard origin/main
             if [ -n "$MONGODB_URI" ]; then
-              echo "MONGODB_URI=$MONGODB_URI" > backend/.env
-              echo "JWT_SECRET=$JWT_SECRET" >> backend/.env
+              printf 'MONGODB_URI=%s\n' "$MONGODB_URI" > backend/.env
+              printf 'JWT_SECRET=%s\n' "$JWT_SECRET" >> backend/.env
               echo "PORT=3001" >> backend/.env
               echo "==> backend/.env configurado"
             fi

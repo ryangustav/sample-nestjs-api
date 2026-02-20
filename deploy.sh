@@ -10,6 +10,10 @@ git fetch origin && git reset --hard origin/main
 
 echo "==> Instalando dependências do backend..."
 cd backend && npm ci
+if [ -f .env ]; then
+  sed -i 's/\r$//' .env
+  grep -q 'mongodb' .env || { echo "ERRO: backend/.env sem MONGODB_URI válido"; exit 1; }
+fi
 npm run build
 cd ..
 

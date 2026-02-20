@@ -1,9 +1,13 @@
+import * as path from 'path';
+import { config } from 'dotenv';
+
+config({ path: path.join(__dirname, '..', '.env') });
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as net from 'net';
 import * as fs from 'fs';
-import * as path from 'path';
 import { AppModule } from './app.module';
 
 function isPortFree(port: number): Promise<boolean> {
