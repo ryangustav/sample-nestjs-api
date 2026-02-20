@@ -1,7 +1,7 @@
 {
   "name": "master-cheat",
   "version": "1.0.0",
-  "description": "Master Cheat - Private Key Gen System",
+  "description": "Master Cheat - Private Key Gen System for Cheats",
   "scripts": {
     "start": "node start.js",
     "build": "cd backend && npm run build && cd ../frontend && npm run build",
