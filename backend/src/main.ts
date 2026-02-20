@@ -1,7 +1,13 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import { config } from 'dotenv';
 
-config({ path: path.join(__dirname, '..', '.env') });
+const envPath = path.join(process.cwd(), '.env');
+if (fs.existsSync(envPath)) {
+  config({ path: envPath });
+} else {
+  config({ path: path.join(__dirname, '..', '.env') });
+}
 
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';

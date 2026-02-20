@@ -10,9 +10,11 @@ module.exports = {
       autorestart: true,
       watch: false,
       max_memory_restart: '256M',
+      interpreter_args: '-r dotenv/config',
       env: {
         NODE_ENV: 'production',
         PORT: 3001,
+        DOTENV_CONFIG_PATH: path.resolve(__dirname, 'backend', '.env'),
       },
     },
   ],
