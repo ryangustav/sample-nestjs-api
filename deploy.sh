@@ -9,7 +9,7 @@ cd "$APP_DIR"
 git fetch origin && git reset --hard origin/main
 
 echo "==> Instalando dependências do backend..."
-cd backend && npm ci --omit=dev
+cd backend && npm ci
 npm run build
 cd ..
 

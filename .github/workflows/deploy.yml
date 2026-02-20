@@ -16,7 +16,18 @@ jobs:
           key: ${{ secrets.ORACLE_SSH_KEY }}
           port: 22
           script: |
-            cd ${{ secrets.ORACLE_APP_PATH }}
+            APP_PATH="${{ secrets.ORACLE_APP_PATH }}"
+            REPO_URL="https://github.com/${{ github.repository }}.git"
+            PARENT="$(dirname "$APP_PATH")"
+            NAME="$(basename "$APP_PATH")"
+            mkdir -p "$PARENT"
+            cd "$PARENT"
+            if [ ! -d "$NAME/.git" ]; then
+              echo "==> Clonando repositório..."
+              rm -rf "$NAME"
+              git clone "$REPO_URL" "$NAME"
+            fi
+            cd "$APP_PATH"
             git fetch origin && git reset --hard origin/main
             chmod +x deploy.sh
             ./deploy.sh
