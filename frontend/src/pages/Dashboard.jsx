@@ -3,10 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import api from '../api';
 
+const TEMPO_OPTIONS = [
+  { value: 1, label: '1 hora' },
+  { value: 6, label: '6 horas' },
+  { value: 12, label: '12 horas' },
+  { value: 24, label: '1 dia' },
+  { value: 168, label: '7 dias' },
+  { value: 360, label: '15 dias' },
+  { value: 720, label: '30 dias' },
+  { value: 1440, label: '60 dias' },
+  { value: 2160, label: '90 dias' },
+  { value: 4320, label: '180 dias' },
+  { value: 8760, label: '1 ano' },
+];
+
+function formatTempoHours(hours) {
+  if (hours < 24) return `${hours} hora${hours > 1 ? 's' : ''}`;
+  const dias = Math.round(hours / 24);
+  return `${dias} dia${dias > 1 ? 's' : ''}`;
+}
+
 function Dashboard() {
   const [codes, setCodes] = useState([]);
   const [nome, setNome] = useState('');
-  const [tempoDias, setTempoDias] = useState('30');
+  const [tempoHoras, setTempoHoras] = useState('24');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const username = localStorage.getItem('username');
@@ -33,12 +53,9 @@ function Dashboard() {
 
     setLoading(true);
     try {
-      const expirationDate = new Date();
-      expirationDate.setDate(expirationDate.getDate() + parseInt(tempoDias));
-
       const { data } = await api.post('/codes/generate', {
         nome: nome.trim(),
-        tempo: expirationDate.toISOString(),
+        tempo: parseInt(tempoHoras, 10),
       });
 
       toast.success(`Código gerado: ${data.code}`);
@@ -84,7 +101,25 @@ function Dashboard() {
     });
   };
 
-  const isExpired = (dateStr) => new Date() > new Date(dateStr);
+  const getExpiraEm = (item) => {
+    if (item.tempo instanceof Date || typeof item.tempo === 'string') {
+      return formatDate(item.tempo);
+    }
+    if (!item.firstUsedAt) {
+      return `${formatTempoHours(item.tempo)} após 1º uso`;
+    }
+    const expiresAt = new Date(new Date(item.firstUsedAt).getTime() + item.tempo * 60 * 60 * 1000);
+    return formatDate(expiresAt);
+  };
+
+  const isExpired = (item) => {
+    if (item.tempo instanceof Date || typeof item.tempo === 'string') {
+      return new Date() > new Date(item.tempo);
+    }
+    if (!item.firstUsedAt) return false;
+    const expiresAt = new Date(new Date(item.firstUsedAt).getTime() + item.tempo * 60 * 60 * 1000);
+    return new Date() > expiresAt;
+  };
 
   return (
     <div className="dashboard">
@@ -114,16 +149,13 @@ function Dashboard() {
               />
             </div>
             <div className="form-group">
-              <label>Tempo de Expiração</label>
-              <select value={tempoDias} onChange={(e) => setTempoDias(e.target.value)}>
-                <option value="1">1 dia</option>
-                <option value="7">7 dias</option>
-                <option value="15">15 dias</option>
-                <option value="30">30 dias</option>
-                <option value="60">60 dias</option>
-                <option value="90">90 dias</option>
-                <option value="180">180 dias</option>
-                <option value="365">1 ano</option>
+              <label>Validade (a partir do 1º uso)</label>
+              <select value={tempoHoras} onChange={(e) => setTempoHoras(e.target.value)}>
+                {TEMPO_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
               </select>
             </div>
             <button type="submit" className="btn-generate" disabled={loading}>
@@ -145,7 +177,7 @@ function Dashboard() {
                   <tr>
                     <th>Código</th>
                     <th>Usuário</th>
-                    <th>Expira em</th>
+                    <th>Validade</th>
                     <th>Status</th>
                     <th>Criado em</th>
                     <th>Ações</th>
@@ -164,10 +196,10 @@ function Dashboard() {
                         </span>
                       </td>
                       <td>{item.nome}</td>
-                      <td>{formatDate(item.tempo)}</td>
+                      <td>{getExpiraEm(item)}</td>
                       <td>
-                        <span className={`status-badge ${isExpired(item.tempo) ? 'expired' : 'active'}`}>
-                          {isExpired(item.tempo) ? 'Expirado' : 'Ativo'}
+                        <span className={`status-badge ${isExpired(item) ? 'expired' : 'active'}`}>
+                          {isExpired(item) ? 'Expirado' : 'Ativo'}
                         </span>
                       </td>
                       <td>{formatDate(item.createdAt)}</td>

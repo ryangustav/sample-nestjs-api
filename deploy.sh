@@ -22,6 +22,10 @@ cd frontend && npm ci
 npm run build
 cd ..
 
+echo "==> Configurando código especial FreeUser12Hours..."
+cd backend && npx ts-node src/seedSpecialCode.ts 2>/dev/null || true
+cd ..
+
 echo "==> Reiniciando aplicação..."
 pm2 restart ecosystem.config.js --env production || pm2 start ecosystem.config.js --env production
 pm2 save

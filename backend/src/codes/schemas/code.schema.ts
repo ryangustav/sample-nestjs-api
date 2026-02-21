@@ -10,7 +10,10 @@ export class Code extends Document {
   nome: string;
 
   @Prop({ required: true })
-  tempo: Date;
+  tempo: number | Date;
+
+  @Prop({ type: Date, default: null })
+  firstUsedAt: Date | null;
 
   @Prop({ type: Types.ObjectId, ref: 'Admin' })
   createdBy: Types.ObjectId;
@@ -22,5 +25,14 @@ export class Code extends Document {
 export const CodeSchema = SchemaFactory.createForClass(Code);
 
 CodeSchema.virtual('expired').get(function () {
-  return new Date() > this.tempo;
+  if (this.firstUsedAt) {
+    if (typeof this.tempo === 'number') {
+      const tempoMs = this.tempo * 60 * 60 * 1000;
+      return new Date().getTime() > this.firstUsedAt.getTime() + tempoMs;
+    }
+  }
+  if (this.tempo instanceof Date) {
+    return new Date() > this.tempo;
+  }
+  return false;
 });
