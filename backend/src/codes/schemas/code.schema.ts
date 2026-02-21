@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
 @Schema({ timestamps: true, toJSON: { virtuals: true } })
 export class Code extends Document {
@@ -9,7 +9,7 @@ export class Code extends Document {
   @Prop({ required: true, trim: true })
   nome: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: MongooseSchema.Types.Mixed })
   tempo: number | Date;
 
   @Prop({ type: Date, default: null })
