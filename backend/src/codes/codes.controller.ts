@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, UseGuards, Request, Headers, Query } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CodesService } from './codes.service';
 import { GenerateCodeDto } from './dto/generate-code.dto';
@@ -26,12 +26,7 @@ export class CodesController {
   }
 
   @Get('verify/:code')
-  async verify(
-    @Param('code') code: string,
-    @Headers('x-device-id') deviceId: string,
-    @Query('deviceId') deviceIdQuery: string,
-  ) {
-    const deviceId = deviceId || deviceIdQuery;
-    return this.codesService.verify(code, deviceId);
+  async verify(@Param('code') code: string) {
+    return this.codesService.verify(code);
   }
 }

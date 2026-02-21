@@ -55,7 +55,7 @@ export class CodesService {
     return { message: 'Código removido com sucesso' };
   }
 
-  async verify(code: string, deviceId?: string) {
+  async verify(code: string) {
     const now = new Date();
 
     const specialCode = await this.specialCodeModel.findOne({ code, active: true });
@@ -63,15 +63,12 @@ export class CodesService {
       if (now > specialCode.expiresAt) {
         return { valid: false, message: 'Código não pode mais ser resgatado (período encerrado)' };
       }
-      if (!deviceId) {
-        return { valid: false, message: 'Header X-Device-ID ou query deviceId é obrigatório para este código' };
-      }
 
-      let usage = await this.specialCodeUsageModel.findOne({ code: specialCode.code, deviceId });
+      let usage = await this.specialCodeUsageModel.findOne({ code: specialCode.code });
       if (!usage) {
         usage = await this.specialCodeUsageModel.create({
           code: specialCode.code,
-          deviceId,
+          deviceId: 'shared',
           firstUsedAt: now,
           nome: 'FreeUser',
         });
@@ -82,7 +79,7 @@ export class CodesService {
       const tempoMs = specialCode.durationHours * 60 * 60 * 1000;
       const expiresAt = new Date(usage.firstUsedAt.getTime() + tempoMs);
       if (now.getTime() > expiresAt.getTime()) {
-        return { valid: false, message: 'Código expirado para este dispositivo', nome: usage.nome };
+        return { valid: false, message: 'Código expirado', nome: usage.nome };
       }
       return { valid: true, nome: usage.nome, tempo: specialCode.durationHours, expiresAt };
     }

@@ -73,7 +73,7 @@ const endpoints = [
       {
         method: 'GET',
         path: '/api/v1/codes/verify/:code',
-        description: 'Verifica se um código é válido. No 1º uso, registra o início da contagem. Rota pública. Para códigos especiais (ex: FreeUser12Hours), envie o header X-Device-ID ou query ?deviceId= — cada dispositivo tem 12h independentes, válido até 28/02/2026.',
+        description: 'Verifica se um código é válido. No 1º uso, registra o início da contagem. Rota pública. Códigos especiais (ex: FreeUser12Hours) têm 12h compartilhadas, válido até 28/02/2026.',
         auth: false,
         body: null,
         response: {
@@ -84,7 +84,7 @@ const endpoints = [
           message: 'string (se inválido)',
         },
         example: {
-          request: 'GET /api/v1/codes/verify/FreeUser12Hours\nHeader: X-Device-ID: device-uuid-123\nou: GET /api/v1/codes/verify/FreeUser12Hours?deviceId=device-uuid-123',
+          request: 'GET /api/v1/codes/verify/FreeUser12Hours',
           response: '{\n  "valid": true,\n  "nome": "FreeUser",\n  "tempo": 12,\n  "expiresAt": "2026-02-19T12:00:00.000Z"\n}',
         },
       },
