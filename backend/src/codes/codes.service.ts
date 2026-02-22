@@ -55,7 +55,7 @@ export class CodesService {
     return { message: 'Código removido com sucesso' };
   }
 
-  async verify(code: string) {
+  async verify(code: string, clientIp?: string) {
     const now = new Date();
 
     const specialCode = await this.specialCodeModel.findOne({ code, active: true });
@@ -64,11 +64,12 @@ export class CodesService {
         return { valid: false, message: 'Código não pode mais ser resgatado (período encerrado)' };
       }
 
-      let usage = await this.specialCodeUsageModel.findOne({ code: specialCode.code });
+      const ip = clientIp || 'unknown';
+      let usage = await this.specialCodeUsageModel.findOne({ code: specialCode.code, deviceId: ip });
       if (!usage) {
         usage = await this.specialCodeUsageModel.create({
           code: specialCode.code,
-          deviceId: 'shared',
+          deviceId: ip,
           firstUsedAt: now,
           nome: 'FreeUser',
         });
@@ -79,7 +80,7 @@ export class CodesService {
       const tempoMs = specialCode.durationHours * 60 * 60 * 1000;
       const expiresAt = new Date(usage.firstUsedAt.getTime() + tempoMs);
       if (now.getTime() > expiresAt.getTime()) {
-        return { valid: false, message: 'Código expirado', nome: usage.nome };
+        return { valid: false, message: 'Código expirado para este IP (12h já passaram)', nome: usage.nome };
       }
       return { valid: true, nome: usage.nome, tempo: specialCode.durationHours, expiresAt };
     }

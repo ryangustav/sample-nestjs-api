@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, UseGuards, Request, Headers } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CodesService } from './codes.service';
 import { GenerateCodeDto } from './dto/generate-code.dto';
@@ -26,7 +26,13 @@ export class CodesController {
   }
 
   @Get('verify/:code')
-  async verify(@Param('code') code: string) {
-    return this.codesService.verify(code);
+  async verify(
+    @Param('code') code: string,
+    @Request() req,
+    @Headers('x-forwarded-for') xForwardedFor: string,
+    @Headers('x-real-ip') xRealIp: string,
+  ) {
+    const ip = (xRealIp || xForwardedFor?.split(',')[0]?.trim() || req?.connection?.remoteAddress || req?.ip || '').toString();
+    return this.codesService.verify(code, ip);
   }
 }
